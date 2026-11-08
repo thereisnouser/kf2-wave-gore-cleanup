@@ -1,0 +1,17 @@
+# KF2 SDK / compiled game packages
+*.u
+Unpublished/
+BrewedPC/
+Binaries/
+
+# Runtime logs and local backups
+*.log
+*.bak
+*.tmp
+
+# Windows / IDE files
+Thumbs.db
+Desktop.ini
+.vs/
+.idea/
+.vscode/
