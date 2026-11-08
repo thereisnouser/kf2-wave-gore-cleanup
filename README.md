@@ -26,10 +26,10 @@ Extract this archive anywhere on the development PC. In PowerShell, from the ext
 powershell.exe -ExecutionPolicy Bypass -File .\setup-and-build.ps1
 ```
 
-This copies `.uc` sources into:
+This copies `.uc` sources into the installed KF2 SDK's `Development\Src` directory (the one `KFEditor make` uses):
 
 ```text
-%USERPROFILE%\Documents\My Games\KillingFloor2\KFGame\Src\WaveGoreCleanup\Classes\
+<SDK installation folder>\Development\Src\WaveGoreCleanup\Classes\
 ```
 
 It preserves your existing `KFEditor.ini` sections and package registrations. Existing source and editor config files are backed up with a `.bak` suffix before changing.
@@ -51,6 +51,10 @@ Expected output:
 ### If the build fails
 
 Capture the actual UnrealScript compiler errors before changing implementation. Do not blindly alter the public server launch scripts. Check especially whether your SDK exposes `DecalManager.Reset()` and the native gore-manager methods.
+
+## Compilation note
+
+First user SDK build: **0 errors and 1 warning** (`bBlockPlayers=false` unsupported default). The unsupported property has been removed. Recompile and test the new code locally; compilation alone does not validate multiplayer behavior.
 
 ## Local-only smoke test
 

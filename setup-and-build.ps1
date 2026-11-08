@@ -1,4 +1,5 @@
 # Wave Gore Cleanup v0.1.0 - LOCAL SDK setup and optional build.
+# Copies sources into the installed KF2 SDK's Development\Src directory.
 # This script DOES NOT touch X:\server\ or running KF2 server processes.
 param(
     [switch]$Build,
@@ -10,9 +11,28 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $src = Join-Path $here 'Src\WaveGoreCleanup'
 $docs = [Environment]::GetFolderPath('MyDocuments')
 $userKF2 = Join-Path $docs 'My Games\KillingFloor2\KFGame'
-$dst = Join-Path $userKF2 'Src\WaveGoreCleanup'
-$classes = Join-Path $dst 'Classes'
 $config = Join-Path $userKF2 'Config\KFEditor.ini'
+
+if ([string]::IsNullOrWhiteSpace($SdkDir)) {
+    $steamCommon = 'F:\Steam\steamapps\common'
+    if (-not (Test-Path $steamCommon)) {
+        throw 'SDK path not found. Pass -SdkDir to point to the KF2 SDK/game directory.'
+    }
+    $candidate = Get-ChildItem $steamCommon -Directory | Where-Object {
+        Test-Path (Join-Path $_.FullName 'Binaries\Win64\KFEditor.exe')
+    } | Select-Object -First 1
+    if (-not $candidate) {
+        throw 'KFEditor.exe not found. Install Killing Floor 2 SDK via Steam, or pass -SdkDir.'
+    }
+    $SdkDir = $candidate.FullName
+}
+
+if (-not (Test-Path (Join-Path $SdkDir 'Development\Src'))) {
+    throw "KF2 SDK UnrealScript source directory missing: $SdkDir\Development\Src"
+}
+
+$dst = Join-Path $SdkDir 'Development\Src\WaveGoreCleanup'
+$classes = Join-Path $dst 'Classes'
 
 if (-not (Test-Path (Join-Path $src 'Classes\WaveGoreCleanupMutator.uc'))) {
     throw "Source files not found in: $src"
@@ -28,7 +48,7 @@ Get-ChildItem (Join-Path $src 'Classes') -Filter '*.uc' | ForEach-Object {
     }
     Copy-Item $_.FullName $target -Force
 }
-Write-Host "[OK] Sources copied to $classes" -ForegroundColor Green
+Write-Host "[OK] Sources copied to SDK development folder: $classes" -ForegroundColor Green
 
 # Preserve existing packages (such as a previous W4QoL prototype).
 if (-not (Test-Path $config)) {
@@ -57,20 +77,6 @@ Write-Host "[OK] KFEditor.ini registered WaveGoreCleanup: $config" -ForegroundCo
 if (-not $Build) {
     Write-Host 'Sources are ready. Run with -Build after confirming SDK is installed.' -ForegroundColor Cyan
     exit 0
-}
-
-if ([string]::IsNullOrWhiteSpace($SdkDir)) {
-    $steamCommon = 'F:\Steam\steamapps\common'
-    if (-not (Test-Path $steamCommon)) {
-        throw 'SDK path not found. Pass -SdkDir to point to the KF2 SDK/game directory.'
-    }
-    $candidate = Get-ChildItem $steamCommon -Directory | Where-Object {
-        Test-Path (Join-Path $_.FullName 'Binaries\Win64\KFEditor.exe')
-    } | Select-Object -First 1
-    if (-not $candidate) {
-        throw 'KFEditor.exe not found. Install Killing Floor 2 SDK via Steam, or pass -SdkDir.'
-    }
-    $SdkDir = $candidate.FullName
 }
 
 $editor = Join-Path $SdkDir 'Binaries\Win64\KFEditor.exe'

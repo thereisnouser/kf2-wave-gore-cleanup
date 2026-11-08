@@ -103,5 +103,4 @@ defaultproperties
     bHidden=true
     bCollideActors=false
     bBlockActors=false
-    bBlockPlayers=false
 }
