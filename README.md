@@ -12,7 +12,7 @@ Small **UnrealScript mutator for Killing Floor 2** that cleans visible corpse an
 
 ## Status / constraints
 
-**Prototype only: not compiled or tested against the user's installed Windows KF2 SDK.** The script interfaces were checked against KF2 UnrealScript source, but compilation and in-game validation are still required.
+**Locally tested prototype (2026-11-10):** The KF2 SDK compiled the package and the first standalone Spillway test visually confirmed blood and corpse removal when the next wave starts. In `Launch.log`, the mutator initialized, a client helper was created, and two cleanup events were logged at 58.88 s and 122.49 s. Multiplayer replication, server distribution, dropped-weapons persistence, and ranked/XP compatibility remain untested.
 
 A newly compiled custom mutator is **not automatically whitelisted**. Ordinary launch via `?Mutator=WaveGoreCleanup.WaveGoreCleanupMutator` can make a server unranked and stop perk XP progression. It is not enough to say that the code only changes graphics. There is no promise that this will remain ranked under SafeMutLoader or Unofficial KF2 Patch. Do not deploy to servers 1 or 2 while public players are active.
 
@@ -54,7 +54,7 @@ Capture the actual UnrealScript compiler errors before changing implementation. 
 
 ## Compilation note
 
-First user SDK build: **0 errors and 1 warning** (`bBlockPlayers=false` unsupported default). The unsupported property has been removed. Recompile and test the new code locally; compilation alone does not validate multiplayer behavior.
+The first user SDK build succeeded with **0 errors and 1 warning** (`bBlockPlayers=false`, an unsupported default). The unsupported property was removed. A subsequent SDK run reported **0 errors and 0 warnings**, although it said `No scripts need recompiling` (so that particular run was not a fresh recompilation). The standalone game run confirmed that local cleanup works.
 
 ## Local-only smoke test
 
@@ -78,10 +78,10 @@ The first two are **server** messages; the third is a **client** message.
 
 ## Compatibility and next steps
 
-1. Compile the UnrealScript package and fix any SDK-specific errors.
-2. Validate actual corpse/blood cleanup locally, including temporary decals and client join-in-progress.
-3. Test with two clients; confirm weapons dropped by `DropAllWepsOnDeath=1` survive cleanup.
-4. Determine a verified ranked-compatible deployment route; do not assume it works merely because the UI still displays a ranked badge.
+1. Completed: compile package and confirm local blood/corpse cleanup on Spillway across at least two wave starts.
+2. Next: test on an **isolated private dedicated server** with two clients and correct `.u` distribution; include join-in-progress.
+3. Confirm dropped weapons (`DropAllWepsOnDeath=1`) survive cleanup and cosmetic decals do not persist incorrectly.
+4. Determine a verified ranked-compatible deployment route and test actual perk XP; a ranked badge alone is not proof.
 5. Only after controlled tests, consider `W4 / #2` deployment; keep `W4 / #1` untouched without a separate request.
 
 ## Reference API locations
