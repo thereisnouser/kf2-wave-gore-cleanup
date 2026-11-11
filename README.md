@@ -12,7 +12,7 @@ Small **UnrealScript mutator for Killing Floor 2** that cleans visible corpse an
 
 ## Status / constraints
 
-**Locally tested prototype (2026-11-10):** The KF2 SDK compiled the package and the first standalone Spillway test visually confirmed blood and corpse removal when the next wave starts. In `Launch.log`, the mutator initialized, a client helper was created, and two cleanup events were logged at 58.88 s and 122.49 s. Multiplayer replication, server distribution, dropped-weapons persistence, and ranked/XP compatibility remain untested.
+**Standalone and single-client dedicated-server test passed (2026-11-10 through 2026-11-12):** The KF2 SDK compiled the package; a standalone Spillway test visually confirmed blood and corpse removal and logged two local cleanup events (58.88 s and 122.49 s). On the W4 #2 dedicated server, the server log confirms both mutators loaded, initialization, player connection, and a helper for `KFPlayerController_0`. The tester visually confirmed cleanup at the start of wave 2. This was a loopback connection with the client already having the `.u` package; **a second remote client, automatic package distribution, dropped-weapon persistence, and ranked/XP compatibility remain untested**.
 
 A newly compiled custom mutator is **not automatically whitelisted**. Ordinary launch via `?Mutator=WaveGoreCleanup.WaveGoreCleanupMutator` can make a server unranked and stop perk XP progression. It is not enough to say that the code only changes graphics. There is no promise that this will remain ranked under SafeMutLoader or Unofficial KF2 Patch. Do not deploy to servers 1 or 2 while public players are active.
 
@@ -78,11 +78,19 @@ The first two are **server** messages; the third is a **client** message.
 
 ## Compatibility and next steps
 
-1. Completed: compile package and confirm local blood/corpse cleanup on Spillway across at least two wave starts.
-2. Next: test on an **isolated private dedicated server** with two clients and correct `.u` distribution; include join-in-progress.
-3. Confirm dropped weapons (`DropAllWepsOnDeath=1`) survive cleanup and cosmetic decals do not persist incorrectly.
-4. Determine a verified ranked-compatible deployment route and test actual perk XP; a ranked badge alone is not proof.
-5. Only after controlled tests, consider `W4 / #2` deployment; keep `W4 / #1` untouched without a separate request.
+1. Completed: SDK compilation and standalone visual cleanup on Spillway across at least two wave starts.
+2. Completed: W4 #2 dedicated server with Unofficial KF2 Patch and one loopback-connected client; cleanup observed at start of wave 2.
+3. Next: test a **second remote client**, confirm package delivery and join-in-progress, and verify cleanup on both screens.
+4. Confirm dropped weapons (`DropAllWepsOnDeath=1`) survive cleanup and cosmetic decals do not persist incorrectly.
+5. Determine a verified ranked-compatible deployment route and test actual perk XP; a ranked badge alone is not proof. The localhost log includes `Skipping online subsystem authentication` and `Can't start an online game in state 0`.
+6. Clean up the server helper loop so it ignores WebAdmin's `TeamChatProxy` (observed in the log). This is cosmetic/efficiency work and has not yet been committed to code.
+7. Keep W4 #1 untouched. Do not open W4 #2 to ordinary players until ranked/XP behavior and client delivery are proven.
+
+### Other log messages observed during dedicated-server test
+
+- Server was able to load the previously installed Unofficial KF2 Patch, but Workshop update of item `2875147606` failed.
+- `UKFP_UI_HUD` and later `ENV_StaticShadow_Test_MESH` missing-asset warnings appeared. These are distinct from our successful gore cleanup and may need separate investigation.
+- A server log cannot show `Local gore cleanup completed` because that log line is written client-side.
 
 ## Reference API locations
 
