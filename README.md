@@ -62,7 +62,7 @@ Join your test server, finish a wave and watch the beginning of the next wave. O
 Look for these messages in the server log:
 
 ```text
-[Wave Gore Cleanup] Mutator initialized (v0.1.0)
+[Wave Gore Cleanup] Runtime initialized (v0.1.1)
 [Wave Gore Cleanup] Client helper created for
 ```
 
@@ -80,7 +80,7 @@ Stop the test server, remove only `WaveGoreCleanup.WaveGoreCleanupMutator` from 
 
 - Intended for modded/Unranked Survival servers. Not officially whitelisted by Tripwire; Ranked progression is not guaranteed.
 - Standalone and single-client dedicated-server cleanup were visually verified with the original prototype.
-- An initial dedicated test with Unofficial KF2 Patch succeeded. The latest WebAdmin controller filter compiles, but has not yet been verified in a running server.
+- An initial dedicated test with Unofficial KF2 Patch succeeded. The WebAdmin controller filter compiled in the first Workshop build. The new Safe Mut Loader entry point and runtime are awaiting compilation and multiplayer verification.
 - Remote multiplayer, join-in-progress, automatic client package delivery, pickup persistence and actual perk XP remain unverified.
 
 ## 🛠️ Development
@@ -126,7 +126,7 @@ Finish a wave, observe the cleanup, then confirm that new gore appears during co
 
 ### Implementation
 
-The server-side `WaveGoreCleanupMutator` creates a replicated, owner-relevant helper for each `KFPlayerController`. The client-side `WaveGoreCleanupClient` checks replicated wave state every 250 ms and uses `KFGoreManager` and the local decal pools to remove old gore. It does not use cheat commands.
+The entry-point `WaveGoreCleanupMutator` supports conventional loading and advertises `WaveGoreCleanupRuntime` to Safe Mut Loader. The server-only runtime creates a replicated, owner-relevant helper for each `KFPlayerController`. This change is awaiting SDK and runtime verification. The client-side `WaveGoreCleanupClient` checks replicated wave state every 250 ms and uses `KFGoreManager` and the local decal pools to remove old gore. It does not use cheat commands.
 
 See [development notes](docs/development-notes.md) for build history, SDK troubleshooting, reference APIs and the remaining validation plan.
 

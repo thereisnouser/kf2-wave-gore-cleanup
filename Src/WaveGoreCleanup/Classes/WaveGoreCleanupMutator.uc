@@ -1,56 +1,66 @@
-// Wave Gore Cleanup 0.1.0
-// Server-side bootstrap: keeps one client-side cleanup helper per player.
-// Neither the game mode nor the existing Unofficial KF2 Patch is replaced.
+// Wave Gore Cleanup 0.1.1
+// Entry point for conventional loading and Safe Mut Loader.
 class WaveGoreCleanupMutator extends KFMutator;
 
-function InitMutator(string Options, out string ErrorMessage)
+var private WaveGoreCleanupRuntime Runtime;
+
+public simulated function bool SafeDestroy()
 {
-    super.InitMutator(Options, ErrorMessage);
-
-    `log("[Wave Gore Cleanup] Mutator initialized (v0.1.0)");
-
-    // Also handles players joining after the match has started.
-    SetTimer(1.0, true, 'EnsureClientHelpers');
-    EnsureClientHelpers();
+    return (bPendingDelete || bDeleteMe || Destroy());
 }
 
-function EnsureClientHelpers()
+public event PreBeginPlay()
 {
-    local KFPlayerController PC;
-    local WaveGoreCleanupClient Helper;
-    local bool bAlreadyPresent;
+    Super.PreBeginPlay();
 
-    if (Role != ROLE_Authority)
+    if (WorldInfo.NetMode == NM_Client)
     {
         return;
     }
 
-    foreach WorldInfo.AllControllers(class'KFPlayerController', PC)
+    foreach WorldInfo.DynamicActors(class'WaveGoreCleanupRuntime', Runtime)
     {
-        if (PC == None)
+        if (!Runtime.bDeleteMe)
         {
-            continue;
+            break;
         }
-
-        bAlreadyPresent = false;
-        foreach WorldInfo.AllActors(class'WaveGoreCleanupClient', Helper)
-        {
-            if (Helper.Owner == PC)
-            {
-                bAlreadyPresent = true;
-                break;
-            }
-        }
-
-        if (!bAlreadyPresent)
-        {
-            Helper = Spawn(class'WaveGoreCleanupClient', PC);
-            if (Helper != None)
-            {
-                `log("[Wave Gore Cleanup] Client helper created for" @ PC);
-            }
-        }
+        Runtime = None;
     }
+
+    if (Runtime == None)
+    {
+        Runtime = WorldInfo.Spawn(class'WaveGoreCleanupRuntime');
+    }
+
+    if (Runtime == None)
+    {
+        `log("[Wave Gore Cleanup] Unable to spawn runtime");
+        SafeDestroy();
+    }
+}
+
+public function AddMutator(Mutator Mut)
+{
+    if (Mut == Self)
+    {
+        return;
+    }
+
+    if (Mut.Class == Class)
+    {
+        WaveGoreCleanupMutator(Mut).SafeDestroy();
+    }
+    else
+    {
+        Super.AddMutator(Mut);
+    }
+}
+
+static function string GetLocalString(optional int Switch,
+    optional PlayerReplicationInfo RelatedPRI_1,
+    optional PlayerReplicationInfo RelatedPRI_2)
+{
+    return string(class'WaveGoreCleanupRuntime');
 }
 
 defaultproperties

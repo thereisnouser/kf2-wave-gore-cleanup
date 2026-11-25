@@ -2,6 +2,8 @@
 
 ## Unreleased (planned 0.1.1)
 
+- Move server initialization and helper provisioning to a server-only `WaveGoreCleanupRuntime` and expose it through `GetLocalString()` for Safe Mut Loader, following Trader Anywhere's entry-point pattern. SDK compilation and runtime testing pending; Workshop still contains the earlier package.
+
 - Restrict helper creation to `KFPlayerController`, excluding WebAdmin's `TeamChatProxy` by class hierarchy.
 - Synchronize sources into the user `KFGame/Src` directory instead of the SDK development tree; stale user sources caused the old unsupported-property warning.
 - Back up the previous compiled package before each build and verify exit code, output freshness, and a fresh compiler log with zero errors and warnings.
