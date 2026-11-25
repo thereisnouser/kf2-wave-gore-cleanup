@@ -58,7 +58,19 @@ With the game and SDK closed, run:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup-and-build.ps1 -Build -Brew
 ```
 
-This performs a fresh compile, then runs `KFEditor brewcontent -platform=PC WaveGoreCleanup -log`. It requires a newly written, nonempty published package and copies it into `dist/BrewedPC/Script/WaveGoreCleanup.u`, checking the SHA256 hash. Only use the distribution package after this command completes successfully. This step does not upload to Steam or touch dedicated servers. The brew workflow is based on Trader Anywhere; validation for this mod is pending.
+This performs a fresh compile, then runs `KFEditor brewcontent -platform=PC WaveGoreCleanup -log`. It requires a newly written, nonempty published package and copies it into `dist/BrewedPC/Script/WaveGoreCleanup.u`, checking the SHA256 hash. Only use the distribution package after this command completes successfully. This step does not upload to Steam or touch dedicated servers. The brew workflow is based on Trader Anywhere; the first local compile and brew have now succeeded.
+
+### Steam Workshop (maintainers)
+
+A fresh compile and brew completed on 2026-11-25. The distribution package was reported as 11961 bytes, SHA256 `9E0011B9623C9B2C7D80336AE1E82D724D110ED3559084C830D96E2BCBABA9A1`. The SDK also brewed other installed packages, but only WaveGoreCleanup is copied into the distribution directory.
+
+Supply a PNG preview smaller than 1 MB (default: `icon.png` in the repository root). To prepare an isolated Workshop upload without publishing:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\publish-workshop.ps1 -SdkDir 'F:\Steam\steamapps\common\killingfloor2'
+```
+
+The script stages only the distribution binary, preview and metadata in a new directory under `dist/`. Verify the output hash and metadata before first publication. To publish, rerun with `-Upload` while signed into Steam and type `PUBLISH` when prompted. Do not use first publication to update an existing item. A local upload-attempt record prevents accidental retries; check Steam for an existing item even if the uploader reports an error. This script is adapted from Trader Anywhere and still requires a local staging test.
 
 ### If the build fails
 

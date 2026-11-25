@@ -5,7 +5,8 @@
 - Restrict helper creation to `KFPlayerController`, excluding WebAdmin's `TeamChatProxy` by class hierarchy.
 - Synchronize sources into the user `KFGame/Src` directory instead of the SDK development tree; stale user sources caused the old unsupported-property warning.
 - Back up the previous compiled package before each build and verify exit code, output freshness, and a fresh compiler log with zero errors and warnings.
-- Add optional `-Brew` distribution build with fresh output and SHA256 verification (runtime validation pending).
+- Add optional `-Brew` distribution build with fresh output and SHA256 verification; first local brew and distribution file confirmed on 2026-11-25.
+- Add Workshop staging and guarded first-publication script plus draft description. Preview and local staging validation remain pending.
 - Fresh SDK compilation confirmed on 2026-11-25; multiplayer runtime validation of the filter remains pending.
 
 ## 0.1.0 — experimental source prototype

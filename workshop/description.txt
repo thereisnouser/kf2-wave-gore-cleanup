@@ -1,0 +1,23 @@
+[h1]Wave Gore Cleanup[/h1]
+A small mutator for Killing Floor 2 that clears accumulated blood and corpses at the beginning of each wave.
+
+[h1]Features[/h1]
+[list]
+[*] Removes dead bodies, blood splats, blood pools and cosmetic giblets at wave start.
+[*] Cleanup runs locally on each connected client.
+[*] New gore can appear normally during combat.
+[*] Does not intentionally remove weapons, ammo or cash pickups.
+[*] No cheat console commands required.
+[/list]
+
+[h1]Installation[/h1]
+Mutator: WaveGoreCleanup.WaveGoreCleanupMutator
+
+Steam subscription downloads the content but does not automatically enable the mutator on a dedicated server.
+
+[h1]Compatibility and status[/h1]
+Experimental build for modded Survival servers. Local and single-client dedicated server cleanup have been tested. Multiple network clients, automatic package delivery, dropped item persistence and perk progression are still being validated. Not officially whitelisted; Ranked progression is not guaranteed.
+
+[url=https://github.com/thereisnouser/kf2-wave-gore-cleanup]Source code and setup instructions[/url]
+
+Made by thereisnouser
