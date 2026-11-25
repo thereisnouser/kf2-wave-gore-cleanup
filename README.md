@@ -50,6 +50,16 @@ Expected output:
 
 With `-Build`, the script moves the previous package into `WaveGoreCleanupBuildBackups` under the user KFGame directory, checks the compiler exit code, and requires a fresh nonempty package and a fresh log reporting zero errors and zero warnings.
 
+### Prepare a distribution package
+
+With the game and SDK closed, run:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup-and-build.ps1 -Build -Brew
+```
+
+This performs a fresh compile, then runs `KFEditor brewcontent -platform=PC WaveGoreCleanup -log`. It requires a newly written, nonempty published package and copies it into `dist/BrewedPC/Script/WaveGoreCleanup.u`, checking the SHA256 hash. Only use the distribution package after this command completes successfully. This step does not upload to Steam or touch dedicated servers. The brew workflow is based on Trader Anywhere; validation for this mod is pending.
+
 ### If the build fails
 
 Capture the actual UnrealScript compiler errors before changing implementation. Do not blindly alter the public server launch scripts. Check especially whether your SDK exposes `DecalManager.Reset()` and the native gore-manager methods.

@@ -15,3 +15,6 @@ Desktop.ini
 .vs/
 .idea/
 .vscode/
+
+# Local distribution and Workshop staging
+/dist/

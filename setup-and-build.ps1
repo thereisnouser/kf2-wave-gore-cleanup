@@ -3,6 +3,7 @@
 # This script DOES NOT touch X:\server\ or running KF2 server processes.
 param(
     [switch]$Build,
+    [switch]$Brew,
     [string]$SdkDir = ''
 )
 
@@ -74,7 +75,7 @@ if ($content -notmatch '(?im)^\s*ModPackages\s*=\s*WaveGoreCleanup\s*$') {
 }
 Write-Host "[OK] KFEditor.ini registered WaveGoreCleanup: $config" -ForegroundColor Green
 
-if (-not $Build) {
+if (-not ($Build -or $Brew)) {
     Write-Host 'Sources are ready. Run with -Build after confirming SDK is installed.' -ForegroundColor Cyan
     exit 0
 }
@@ -136,4 +137,46 @@ if ($buildLog -notmatch 'Success - 0 error\(s\), 0 warning\(s\)') {
 
 Write-Host "[OK] Fresh package produced: $compiled" -ForegroundColor Green
 Write-Host "[OK] Compilation: 0 errors, 0 warnings" -ForegroundColor Green
+
+if ($Brew) {
+    Write-Host '[INFO] Brewing WaveGoreCleanup...' -ForegroundColor Cyan
+    $brewStartedUtc = [DateTime]::UtcNow
+    $brewProcess = Start-Process -FilePath $editor `
+        -WorkingDirectory (Split-Path $editor -Parent) `
+        -ArgumentList @('brewcontent', '-platform=PC', 'WaveGoreCleanup', '-log') `
+        -PassThru -Wait
+    if ($brewProcess.ExitCode -ne 0) {
+        throw "KFEditor brew exit code: $($brewProcess.ExitCode)"
+    }
+
+    $publishedCandidates = @(
+        (Join-Path $SdkDir 'KFGame\Published\BrewedPC\WaveGoreCleanup.u'),
+        (Join-Path $SdkDir 'KFGame\Published\BrewedPC\Script\WaveGoreCleanup.u'),
+        (Join-Path $userKF2 'Published\BrewedPC\Script\WaveGoreCleanup.u'),
+        (Join-Path $userKF2 'Published\BrewedPC\WaveGoreCleanup.u')
+    )
+    $published = $publishedCandidates |
+        Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } |
+        ForEach-Object { Get-Item -LiteralPath $_ } |
+        Where-Object { $_.LastWriteTimeUtc -ge $brewStartedUtc -and $_.Length -gt 0 } |
+        Sort-Object LastWriteTimeUtc -Descending |
+        Select-Object -First 1
+
+    if (-not $published) {
+        throw 'Fresh brewed WaveGoreCleanup.u not found in SDK or user Published folders. See SDK logs.'
+    }
+
+    $distDir = Join-Path $here 'dist\BrewedPC\Script'
+    New-Item -ItemType Directory -Force -Path $distDir | Out-Null
+    $distPackage = Join-Path $distDir 'WaveGoreCleanup.u'
+    Copy-Item -LiteralPath $published.FullName -Destination $distPackage -Force
+    $hash = (Get-FileHash -LiteralPath $published.FullName -Algorithm SHA256).Hash
+    if ((Get-FileHash -LiteralPath $distPackage -Algorithm SHA256).Hash -ne $hash) {
+        throw 'Distribution package hash does not match brewed output.'
+    }
+
+    Write-Host "[OK] Brewed package: $distPackage" -ForegroundColor Green
+    Write-Host "[OK] SHA256: $hash"
+}
+
 Write-Host '[CAUTION] Do not install this test package on ranked public servers.' -ForegroundColor Yellow
