@@ -9,6 +9,12 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+# First publication succeeded. Do not create a duplicate Workshop item.
+$workshopId = '3845518084'
+if ($Upload) {
+    throw "Wave Gore Cleanup already has Workshop item $workshopId. First publication is disabled. Updating this item is not yet supported."
+}
+
 $binary = Join-Path $PSScriptRoot 'dist\BrewedPC\Script\WaveGoreCleanup.u'
 if ([string]::IsNullOrWhiteSpace($PreviewPath)) {
     $PreviewPath = Join-Path $PSScriptRoot 'icon.png'
@@ -83,7 +89,7 @@ Write-Host "Metadata: $metadataFile"
 Write-Host 'Package: WaveGoreCleanup.u | Category: Mutators | Test build'
 Write-Host ('SHA256: ' + (Get-FileHash -LiteralPath $stagedBinary -Algorithm SHA256).Hash)
 if (-not $Upload) {
-    Write-Host "Preparation only. Nothing was uploaded."
+    Write-Host "Preparation only. Nothing was uploaded. Existing Workshop item: $workshopId."
     return
 }
 

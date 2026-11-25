@@ -17,6 +17,8 @@ Join a server running the mutator and play normally. At the start of a new wave,
 
 ## 📦 Installation
 
+[Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3845518084) (item ID: `3845518084`). Subscribing downloads the Workshop content but does not enable the mutator on a dedicated server. The downloaded package and remote client delivery still need verification.
+
 > **Experimental build.** A public release ZIP and a verified automatic installer are not available yet. Workshop distribution and multiplayer compatibility are still being tested. Use a separate modded/Unranked test server, not a live Ranked server.
 
 ### 1. Find your server folder
@@ -110,9 +112,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\publish-workshop.ps1 `
   -SdkDir '<Killing Floor 2 SDK directory>'
 ```
 
-Verify the staged package hash and metadata. For first publication only, sign in to Steam, rerun with `-Upload`, and type `PUBLISH` when prompted. Do not repeat first publication if an item may already exist. Updating by Workshop ID is not implemented yet.
-
-Local staging has been verified; actual Workshop publication is not yet confirmed.
+First publication succeeded on 2026-11-25: [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3845518084) (ID `3845518084`). The `-Upload` option is now disabled to prevent duplicate items. Updating the existing item by Workshop ID is not implemented yet. Preparation-only mode remains available.
 
 ### Local testing
 
@@ -132,7 +132,7 @@ See [development notes](docs/development-notes.md) for build history, SDK troubl
 
 ## 🔗 Links
 
-[Report an issue](https://github.com/thereisnouser/kf2-wave-gore-cleanup/issues) · [Changelog](CHANGELOG.md) · [Development notes](docs/development-notes.md)
+[Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3845518084) · [Report an issue](https://github.com/thereisnouser/kf2-wave-gore-cleanup/issues) · [Changelog](CHANGELOG.md) · [Development notes](docs/development-notes.md)
 
 ---
 

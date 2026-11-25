@@ -70,7 +70,7 @@ Supply a PNG preview smaller than 1 MB (default: `icon.png` in the repository ro
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\publish-workshop.ps1 -SdkDir 'F:\Steam\steamapps\common\killingfloor2'
 ```
 
-The script stages only the distribution binary, preview and metadata in a new directory under `dist/`. Verify the output hash and metadata before first publication. To publish, rerun with `-Upload` while signed into Steam and type `PUBLISH` when prompted. Do not use first publication to update an existing item. A local upload-attempt record prevents accidental retries; check Steam for an existing item even if the uploader reports an error. This script is adapted from Trader Anywhere. Local staging passed after moving preview-path resolution into the script body; the staged SHA256 matched the distribution binary. Actual publication remains unconfirmed.
+The script stages only the distribution binary, preview and metadata in a new directory under `dist/`. Local staging passed after moving preview-path resolution into the script body; the staged SHA256 matched the distribution binary. On 2026-11-25, WorkshopUserTool reported a successful upload, and the maintainer supplied the resulting [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3845518084) URL (item `3845518084`). First publication is now disabled in the script, matching Trader Anywhere. Download verification, remote client distribution and multiplayer validation remain pending.
 
 ### If the build fails
 
