@@ -1,5 +1,5 @@
 # Wave Gore Cleanup v0.1.0 - LOCAL SDK setup and optional build.
-# Copies sources into the installed KF2 SDK's Development\Src directory.
+# Copies sources into the user KF2 KFGame\Src directory.
 # This script DOES NOT touch X:\server\ or running KF2 server processes.
 param(
     [switch]$Build,
@@ -31,7 +31,7 @@ if (-not (Test-Path (Join-Path $SdkDir 'Development\Src'))) {
     throw "KF2 SDK UnrealScript source directory missing: $SdkDir\Development\Src"
 }
 
-$dst = Join-Path $SdkDir 'Development\Src\WaveGoreCleanup'
+$dst = Join-Path $userKF2 'Src\WaveGoreCleanup'
 $classes = Join-Path $dst 'Classes'
 
 if (-not (Test-Path (Join-Path $src 'Classes\WaveGoreCleanupMutator.uc'))) {
@@ -48,7 +48,7 @@ Get-ChildItem (Join-Path $src 'Classes') -Filter '*.uc' | ForEach-Object {
     }
     Copy-Item $_.FullName $target -Force
 }
-Write-Host "[OK] Sources copied to SDK development folder: $classes" -ForegroundColor Green
+Write-Host "[OK] Sources copied to User KF2 source folder: $classes" -ForegroundColor Green
 
 # Preserve existing packages (such as a previous W4QoL prototype).
 if (-not (Test-Path $config)) {
@@ -83,13 +83,57 @@ $editor = Join-Path $SdkDir 'Binaries\Win64\KFEditor.exe'
 if (-not (Test-Path $editor)) {
     throw "KFEditor.exe not found: $editor"
 }
-Write-Host "[INFO] Running KFEditor make in: $SdkDir" -ForegroundColor Cyan
-$proc = Start-Process -FilePath $editor -WorkingDirectory (Split-Path $editor -Parent) `
-    -ArgumentList @('make', '-useunpublished', '-log') -PassThru -Wait
-
 $compiled = Join-Path $userKF2 'Unpublished\BrewedPC\Script\WaveGoreCleanup.u'
-if (-not (Test-Path $compiled)) {
-    throw "Compilation output not found: $compiled. Check KFEditor logs. ExitCode=$($proc.ExitCode)"
+$backupDir = Join-Path $userKF2 'WaveGoreCleanupBuildBackups'
+
+if (Test-Path $compiled) {
+    New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
+    $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
+    $backup = Join-Path $backupDir "WaveGoreCleanup.$stamp.u"
+
+    Move-Item $compiled $backup
+    Write-Host "[OK] Previous package backed up: $backup"
 }
-Write-Host "[OK] Package produced: $compiled" -ForegroundColor Green
+
+$buildStarted = [DateTime]::UtcNow
+
+Write-Host "[INFO] Running KFEditor make in: $SdkDir" -ForegroundColor Cyan
+
+$proc = Start-Process -FilePath $editor `
+    -WorkingDirectory (Split-Path $editor -Parent) `
+    -ArgumentList @('make', '-useunpublished', '-log') `
+    -PassThru -Wait
+
+if ($proc.ExitCode -ne 0) {
+    throw "Compilation failed. ExitCode=$($proc.ExitCode)"
+}
+
+if (-not (Test-Path $compiled)) {
+    throw "Compilation output not found: $compiled"
+}
+
+$output = Get-Item $compiled
+
+if ($output.LastWriteTimeUtc -lt $buildStarted -or $output.Length -eq 0) {
+    throw "Compilation output is stale or empty"
+}
+
+$logPath = Join-Path $userKF2 'Logs\Launch.log'
+
+if (-not (Test-Path $logPath)) {
+    throw "Compiler log not found"
+}
+
+if ((Get-Item $logPath).LastWriteTimeUtc -lt $buildStarted) {
+    throw "Compiler log is stale"
+}
+
+$buildLog = Get-Content $logPath -Raw
+
+if ($buildLog -notmatch 'Success - 0 error\(s\), 0 warning\(s\)') {
+    throw "Clean compilation not confirmed. Check $logPath"
+}
+
+Write-Host "[OK] Fresh package produced: $compiled" -ForegroundColor Green
+Write-Host "[OK] Compilation: 0 errors, 0 warnings" -ForegroundColor Green
 Write-Host '[CAUTION] Do not install this test package on ranked public servers.' -ForegroundColor Yellow

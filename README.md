@@ -26,10 +26,10 @@ Extract this archive anywhere on the development PC. In PowerShell, from the ext
 powershell.exe -ExecutionPolicy Bypass -File .\setup-and-build.ps1
 ```
 
-This copies `.uc` sources into the installed KF2 SDK's `Development\Src` directory (the one `KFEditor make` uses):
+This copies `.uc` sources into the user KF2 source directory, confirmed to be the effective source location in this SDK installation:
 
 ```text
-<SDK installation folder>\Development\Src\WaveGoreCleanup\Classes\
+%USERPROFILE%\Documents\My Games\KillingFloor2\KFGame\Src\WaveGoreCleanup\Classes\
 ```
 
 It preserves your existing `KFEditor.ini` sections and package registrations. Existing source and editor config files are backed up with a `.bak` suffix before changing.
@@ -48,13 +48,15 @@ Expected output:
 %USERPROFILE%\Documents\My Games\KillingFloor2\KFGame\Unpublished\BrewedPC\Script\WaveGoreCleanup.u
 ```
 
+With `-Build`, the script moves the previous package into `WaveGoreCleanupBuildBackups` under the user KFGame directory, checks the compiler exit code, and requires a fresh nonempty package and a fresh log reporting zero errors and zero warnings.
+
 ### If the build fails
 
 Capture the actual UnrealScript compiler errors before changing implementation. Do not blindly alter the public server launch scripts. Check especially whether your SDK exposes `DecalManager.Reset()` and the native gore-manager methods.
 
 ## Compilation note
 
-The first user SDK build succeeded with **0 errors and 1 warning** (`bBlockPlayers=false`, an unsupported default). The unsupported property was removed. A subsequent SDK run reported **0 errors and 0 warnings**, although it said `No scripts need recompiling` (so that particular run was not a fresh recompilation). The standalone game run confirmed that local cleanup works.
+The original SDK build reported an unsupported `bBlockPlayers=false` default. On 2026-11-25, the stale copy in the user `KFGame/Src` directory was identified as the cause of the repeated warning. After correcting source synchronization and moving the old compiled package aside, the SDK compiled and saved `WaveGoreCleanup.u` with **0 errors and 0 warnings**. A further fresh build using the updated automatic rebuild script reported the same compiler result. The new controller filter has not yet been tested in a running multiplayer game.
 
 ## Local-only smoke test
 
@@ -83,7 +85,7 @@ The first two are **server** messages; the third is a **client** message.
 3. Next: test a **second remote client**, confirm package delivery and join-in-progress, and verify cleanup on both screens.
 4. Confirm dropped weapons (`DropAllWepsOnDeath=1`) survive cleanup and cosmetic decals do not persist incorrectly.
 5. Determine a verified ranked-compatible deployment route and test actual perk XP; a ranked badge alone is not proof. The localhost log includes `Skipping online subsystem authentication` and `Can't start an online game in state 0`.
-6. Clean up the server helper loop so it ignores WebAdmin's `TeamChatProxy` (observed in the log). This is cosmetic/efficiency work and has not yet been committed to code.
+6. Implemented and compiled: restrict the helper loop to `KFPlayerController` to exclude WebAdmin's `TeamChatProxy`. Confirm this in the next dedicated-server runtime test.
 7. Keep W4 #1 untouched. Do not open W4 #2 to ordinary players until ranked/XP behavior and client delivery are proven.
 
 ### Other log messages observed during dedicated-server test

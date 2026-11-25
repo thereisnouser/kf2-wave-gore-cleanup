@@ -16,7 +16,7 @@ function InitMutator(string Options, out string ErrorMessage)
 
 function EnsureClientHelpers()
 {
-    local PlayerController PC;
+    local KFPlayerController PC;
     local WaveGoreCleanupClient Helper;
     local bool bAlreadyPresent;
 
@@ -25,7 +25,7 @@ function EnsureClientHelpers()
         return;
     }
 
-    foreach WorldInfo.AllControllers(class'PlayerController', PC)
+    foreach WorldInfo.AllControllers(class'KFPlayerController', PC)
     {
         if (PC == None)
         {
