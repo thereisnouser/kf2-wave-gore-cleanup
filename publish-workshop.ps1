@@ -2,7 +2,7 @@
 param(
     [Parameter(Mandatory = $true)]
     [string]$SdkDir,
-    [string]$PreviewPath = (Join-Path $PSScriptRoot 'icon.png'),
+    [string]$PreviewPath,
     [switch]$Upload
 )
 
@@ -10,6 +10,9 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $binary = Join-Path $PSScriptRoot 'dist\BrewedPC\Script\WaveGoreCleanup.u'
+if ([string]::IsNullOrWhiteSpace($PreviewPath)) {
+    $PreviewPath = Join-Path $PSScriptRoot 'icon.png'
+}
 $preview = $PreviewPath
 $descriptionFile = Join-Path $PSScriptRoot 'workshop\description.txt'
 $tool = Join-Path $SdkDir 'Binaries\WorkshopUserTool.exe'
